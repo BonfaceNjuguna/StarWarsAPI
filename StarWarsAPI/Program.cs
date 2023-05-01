@@ -1,26 +1,36 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using HotChocolate.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using StarWarsAPI.GraphQL;
+using StarWarsAPI.GraphQL.Types;
+using StarWarsAPI.Services;
+using StarWarsAPI.Services.Interfaces;
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient<IStarWarsApiService, StarWarsApiService>();
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddType<CharacterType>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
-app.UseAuthorization();
-
-app.MapControllers();
+app.MapGraphQL("/graphql");
+app.UsePlayground();
 
 app.Run();
-
