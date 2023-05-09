@@ -1,5 +1,4 @@
-﻿using System;
-using StarWarsAPI.Models;
+﻿using StarWarsAPI.Models;
 using StarWarsAPI.Services.Interfaces;
 
 namespace StarWarsAPI.Services
